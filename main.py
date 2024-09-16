@@ -27,9 +27,9 @@ def main():
     parser = argparse.ArgumentParser(description="Expense Tracker")
 
     parser.add_argument("action", help="Action to perform", type=str, choices=["add", "list", "summary", "delete", "update", "add_category", "list_category", "export"])
+    parser.add_argument('--id', required=False, help="ID of the expense", type=int)
     parser.add_argument('--description', required=False, help="Description of the expense", default="", type=str)
     parser.add_argument('--amount', required=False, help="Amount of the expense", default=0, type=float)
-    parser.add_argument('--id', required=False, help="ID of the expense", type=int)
     parser.add_argument('--month', required=False, help="Month of the expense", type=int)
     parser.add_argument('--category', required=False, help="Category of the expense", type=str)
 
@@ -77,6 +77,8 @@ def main():
     
     def addNewExpense(amount, description, category: str):
         try:
+            if  amount is None:
+                print("Amount and description are required")
             if amount <= 0:
                 print("Amount must be greater than 0")
                 return
@@ -108,6 +110,9 @@ def main():
                 print(expense)
 
     def updateExpense(id, amount, description):
+        if id is None:
+            print("ID is required")
+            return
         existExpense = None
         listExpenses = readExpenses()
         for expense in listExpenses:
@@ -115,8 +120,8 @@ def main():
                 existExpense = expense
                 break
         if existExpense is not None:
-            existExpense.amount = amount
-            existExpense.description = description
+            existExpense.amount = amount if amount is not None else existExpense.amount
+            existExpense.description = description if description is not None else existExpense.description
             writeExpenses(listExpenses)
             print(f"Expense with id {id} updated successfully")
         else:
@@ -149,7 +154,7 @@ def main():
             print(f"Total expenses: ${total:<10}")
         else:
             # convert month number to month name
-            print(f"Total expenses for {datetime.date(2000, month, 1).strftime('%B')}: {total:<10}")
+            print(f"Total expenses for {datetime.date(2000, month, 1).strftime('%B')}: ${total:<10}")
 
     def addCategory(category: str):
         def checkCategory(category: str):
